@@ -1,4 +1,4 @@
-# AfricanDevelopment_web_app
+# African Development Indicators
 
 ## Introduction
 
