@@ -4,6 +4,39 @@ import plotly.graph_objs as go
 # Use this file to read in your data and prepare the plotly visualizations. The path to the data files are in
 # `data/file_name.csv`
 
+def clean_data(dataset,indicators_to_plot, keepcolumns,value_variables):
+  
+  """Cleans raw dataset for the visualization
+
+  Imports the world bank dataset
+  Cleans the dataset by structuring it for the respective feature plot using Arg
+  Reorients the columns into a year, country and value
+  Returns plot-ready data for the top 10 economies in Africa
+
+  Args: 
+      dataset (str):              name of the csv raw dataset from worldbank
+      indicators_to_plot (list):  economic indicator(s) to be visualised
+      keepcolumns:                data columns required for the plot
+  
+  Returns:
+      df_melt(dataframe): plot-ready data
+  
+  """
+  # read in the data
+  df = pd.read_csv(dataset)
+
+  # declare and select the top 10 African Economies from the dataset
+  top10countries = ['Nigeria', 'Egypt, Arab Rep.', 'South Africa', 'Algeria', 'Morocco', 'Kenya', 'Ethiopia', 'Ghana', 'Tanzania', 'Angola']
+  df = df[df['country_name_attr'].isin(top10countries)]
+
+  # select development indicators to plot
+  df_indicator = df[df['indicator_code'] == indicators_to_plot]
+
+
+
+
+
+
 def return_figures():
     """Creates four plotly visualizations
 

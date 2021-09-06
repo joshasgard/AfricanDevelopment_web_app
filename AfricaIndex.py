@@ -1,1 +1,1 @@
-from myapp import app
+from AfricaIndex import app
