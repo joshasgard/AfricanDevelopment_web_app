@@ -4,14 +4,14 @@ import plotly.graph_objs as go
 # Use this file to read in your data and prepare the plotly visualizations. The path to the data files are in
 # `data/file_name.csv`
 
-def clean_data(dataset,indicators_to_plot, keepcolumns,value_variables):
+def clean_data(dataset,indicators_to_plot, keepcolumns = ['country_name_attr', '1990', '2000','2010']):
   
   """Cleans raw dataset for the visualization
 
   Imports the world bank dataset
   Cleans the dataset by structuring it for the respective feature plot using Arg
   Reorients the columns into a year, country and value
-  Returns plot-ready data for the top 10 economies in Africa
+  Returns analysis-ready data for the top 10 economies in Africa
 
   Args: 
       dataset (str):              name of the csv raw dataset from worldbank
@@ -29,16 +29,15 @@ def clean_data(dataset,indicators_to_plot, keepcolumns,value_variables):
   top10countries = ['Nigeria', 'Egypt, Arab Rep.', 'South Africa', 'Algeria', 'Morocco', 'Kenya', 'Ethiopia', 'Ghana', 'Tanzania', 'Angola']
   df = df[df['country_name_attr'].isin(top10countries)]
 
-  # select development indicators to plot
-  df_indicator = df[df['indicator_code'] == indicators_to_plot]
+  # select development indicators to plot and other columns to keep
+  df_indicator = df[df['indicator_code'].isin (indicators_to_plot)]
+  df_indicator = df_indicator[keepcolumns]
 
-
-
-
-
+  return df_indicator
+  
 
 def return_figures():
-    """Creates four plotly visualizations
+    """Creates plotly visualizations
 
     Args:
         None
@@ -48,14 +47,33 @@ def return_figures():
 
     """
 
-    # first chart plots arable land from 1990 to 2015 in top 10 economies 
+    # first chart plots total population from 1990 to 2020 
     # as a line chart
-    
-    graph_one = []    
+    graph_one = []
+
+    # Clean the data and use the WorldBank Indicator standard for total population- "'SP.POP.TOTL'"
+    df = clean_data('data/adi_data.csv',['SP.POP.TOTL'])
+
+    # Add 2020 Population data from worldometer for recency
+    pop_2020 = ['43851044', '32866272', '102334404', '114963588', '31072940', '53771296', '36910560', '206139589', '59308690', '59734218']
+    df.loc[ : , '2020'] = pop_2020
+
+    # Unpivot data into 3 columns using melt
+    value_vars = ['1990', '2000', '2010', '2020']
+    df_melt = df.melt(id_vars = 'country_name_attr', value_vars=value_vars)
+    df_melt.columns = ['country', 'year', 'population']
+    df_melt['year'] = df_melt['year'].astype('datetime64[ns]').dt.year    # year column to datetime
+    df_melt.sort_values('population', ascending=False, inplace =True)
+    countrylist = df_melt.country.unique().tolist()
+
+    for country in countrylist:
+      x_val = df_melt[df_melt['country'] == country].year.tolist()
+      y_val = df_melt[df_melt['country'] == country].population.tolist()
+
     graph_one.append(
       go.Scatter(
-      x = [0, 1, 2, 3, 4, 5],
-      y = [0, 2, 4, 6, 8, 10],
+      x = x_val,
+      y = y_val,
       mode = 'lines'
       )
     )
