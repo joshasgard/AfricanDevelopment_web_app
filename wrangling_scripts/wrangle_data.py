@@ -55,7 +55,7 @@ def return_figures():
     df = clean_data('data/adi_data.csv',['SP.POP.TOTL'])
 
     # Add 2020 Population data from worldometer for recency
-    pop_2020 = ['43851044', '32866272', '102334404', '114963588', '31072940', '53771296', '36910560', '206139589', '59308690', '59734218']
+    pop_2020 = [43851044, 32866272, 102334404, 114963588, 31072940, 53771296, 36910560, 206139589, 59308690, 59734218]
     df.loc[ : , '2020'] = pop_2020
 
     # Unpivot data into 3 columns using melt
@@ -69,18 +69,19 @@ def return_figures():
     for country in countrylist:
       x_val = df_melt[df_melt['country'] == country].year.tolist()
       y_val = df_melt[df_melt['country'] == country].population.tolist()
-
-    graph_one.append(
-      go.Scatter(
-      x = x_val,
-      y = y_val,
-      mode = 'lines'
+      graph_one.append(
+        go.Scatter(
+        x = x_val,
+        y = y_val,
+        mode = 'lines',
+        name = country
+        )
       )
-    )
 
     layout_one = dict(title = 'Chart One',
-                xaxis = dict(title = 'x-axis label'),
-                yaxis = dict(title = 'y-axis label'),
+                xaxis = dict(title = 'Year',
+                  autotick=False, tick0=1990, dtick=25),
+                yaxis = dict(title = 'Population'),
                 )
 
 # second chart plots ararble land for 2015 as a bar chart    
