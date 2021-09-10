@@ -78,64 +78,119 @@ def return_figures():
         )
       )
 
-    layout_one = dict(title = 'Chart One',
+    layout_one = dict(title = 'Change in total Population of the top 10 <br> economies 1990-2020',
                 xaxis = dict(title = 'Year',
-                  autotick=False, tick0=1990, dtick=25),
+                  autotick=False, tick0=1990, dtick=30),
                 yaxis = dict(title = 'Population'),
                 )
 
-# second chart plots ararble land for 2015 as a bar chart    
+# bar chart plot of the 2010 GDP in US Dollars - "NY.GDP.MKTP.KD"   
     graph_two = []
+
+    df = clean_data('data/adi_data.csv', ['NY.GDP.MKTP.KD'])
+    value_vars = ['1990', '2000', '2010']
+    df_melt = df.melt(id_vars = 'country_name_attr', value_vars=value_vars)
+    df_melt.columns = ['country', 'year', 'GDP']
+    df_melt['year'] = df_melt['year'].astype('datetime64[ns]').dt.year
+    df_melt.sort_values('GDP', ascending=False, inplace =True)
+    df_melt = df_melt[df_melt['year'] == 2010]
+
 
     graph_two.append(
       go.Bar(
-      x = ['a', 'b', 'c', 'd', 'e'],
-      y = [12, 9, 7, 5, 1],
+      x = df_melt.country.tolist(),
+      y = df_melt.GDP.tolist(),
       )
     )
 
-    layout_two = dict(title = 'Chart Two',
-                xaxis = dict(title = 'x-axis label',),
-                yaxis = dict(title = 'y-axis label'),
+    layout_two = dict(title = 'Top 10 GDP as at 2010 (US$)',
+                xaxis = dict(title = 'Country',),
+                yaxis = dict(title = 'GDP in US$'),
                 )
 
 
-# third chart plots percent of population that is rural from 1990 to 2015
+# third chart plots GDP per person in the top 10 countries from 1990-2010
     graph_three = []
-    graph_three.append(
-      go.Scatter(
-      x = [5, 4, 3, 2, 1, 0],
-      y = [0, 2, 4, 6, 8, 10],
-      mode = 'lines'
-      )
-    )
 
-    layout_three = dict(title = 'Chart Three',
-                xaxis = dict(title = 'x-axis label'),
-                yaxis = dict(title = 'y-axis label')
-                       )
+    df = clean_data('data/adi_data.csv', ['NY.GDP.PCAP.KD'])
+    value_vars = ['1990', '2000', '2010']
+    df_melt = df.melt(id_vars = 'country_name_attr', value_vars=value_vars)
+    df_melt.columns = ['country', 'year', 'GDP_Per_Capita']
+    df_melt['year'] = df_melt['year'].astype('datetime64[ns]').dt.year
+    df_melt.sort_values('GDP_Per_Capita', ascending=False, inplace =True)
+    countrylist = df_melt.country.unique().tolist()
+
+    for country in countrylist:
+      x_val = df_melt[df_melt['country'] == country].year.tolist()
+      y_val = df_melt[df_melt['country'] == country].GDP_Per_Capita.tolist()
+
+      graph_three.append(
+        go.Scatter(
+        x = x_val,
+        y = y_val,
+        mode = 'lines', 
+        name = country
+        )
+      )
+
+    layout_three = dict(title = 'Change in GDP Per Capita <br> 1990-2010',
+                xaxis = dict(title = 'Year',
+                  autotick=False, tick0=1990, dtick=20),
+                yaxis = dict(title = 'GDP Per Capita (US$)'),
+                )
     
-# fourth chart shows rural population vs arable land
+# fourth chart shows life expectancy vs GDP per capita in each of these countries - "SP.DYN.LE00.IN"
+
     graph_four = []
     
-    graph_four.append(
-      go.Scatter(
-      x = [20, 40, 60, 80],
-      y = [10, 20, 30, 40],
-      mode = 'markers'
-      )
-    )
+    df = clean_data('data/adi_data.csv', ['SP.DYN.LE00.IN'])
+    value_vars = ['1990', '2010']
+    df_melt = df.melt(id_vars = 'country_name_attr', value_vars=value_vars)
+    df_melt.columns = ['country', 'year', 'Life_Exptncy']
+    df_melt['year'] = df_melt['year'].astype('datetime64[ns]').dt.year
+    df_melt.sort_values('Life_Exptncy', ascending=False, inplace =True)
+    countrylist = df_melt.country.unique().tolist()
 
-    layout_four = dict(title = 'Chart Four',
-                xaxis = dict(title = 'x-axis label'),
-                yaxis = dict(title = 'y-axis label'),
+    for country in countrylist:
+      x_val = df_melt[df_melt['country'] == country].year.tolist()
+      y_val = df_melt[df_melt['country'] == country].Life_Exptncy.tolist()
+
+      graph_four.append(
+        go.Scatter(
+        x = x_val,
+        y = y_val,
+        mode = 'lines', 
+        name = country
+        )
+      )
+
+    layout_four = dict(title = 'Life Expectancy at birth 1990-2010',
+                xaxis = dict(title = 'Year',
+                  autotick=False, tick0=1990, dtick=20),
+                yaxis = dict(title = 'Life Expectancy in years'),
                 )
     
+
+    graph_five = []
+    
+    graph_five.append(
+      go.Bar(
+        y = [1,2,3,4,5,6,7,8,9,10,11,12],
+        x = ['a','b','c','d','e','f','g','h','i','j', 'k', 'l']
+      )
+    )
+    
+    layout_five = dict(title = 'Chart five',
+                xaxis = dict(title = 'Number'),
+                yaxis = dict(title = 'Letters'),
+                )
     # append all charts to the figures list
+    
     figures = []
     figures.append(dict(data=graph_one, layout=layout_one))
     figures.append(dict(data=graph_two, layout=layout_two))
     figures.append(dict(data=graph_three, layout=layout_three))
     figures.append(dict(data=graph_four, layout=layout_four))
+    figures.append(dict(data=graph_five, layout=layout_five))
 
     return figures
