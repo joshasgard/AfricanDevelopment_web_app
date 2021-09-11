@@ -1,10 +1,12 @@
+from numpy import longlong
 import pandas as pd
 import plotly.graph_objs as go
+import plotly.express as px
 
 # Use this file to read in your data and prepare the plotly visualizations. The path to the data files are in
 # `data/file_name.csv`
 
-def clean_data(dataset,indicators_to_plot, keepcolumns = ['country_name_attr', '1990', '2000','2010']):
+def clean_data(dataset,indicators_to_plot, keepcolumns = ['country_name_attr','1990', '2000','2010']):
   
   """Cleans raw dataset for the visualization
 
@@ -143,6 +145,7 @@ def return_figures():
 
     graph_four = []
     
+# clean data and select country
     df = clean_data('data/adi_data.csv', ['SP.DYN.LE00.IN'])
     value_vars = ['1990', '2010']
     df_melt = df.melt(id_vars = 'country_name_attr', value_vars=value_vars)
@@ -151,6 +154,7 @@ def return_figures():
     df_melt.sort_values('Life_Exptncy', ascending=False, inplace =True)
     countrylist = df_melt.country.unique().tolist()
 
+# plot a line chart for each country in countrylist above
     for country in countrylist:
       x_val = df_melt[df_melt['country'] == country].year.tolist()
       y_val = df_melt[df_melt['country'] == country].Life_Exptncy.tolist()
@@ -170,21 +174,32 @@ def return_figures():
                 yaxis = dict(title = 'Life Expectancy in years'),
                 )
     
+# fifth chart is a bubble plot showing gdp per capita vs life expectancy: Indicator Code - NY.GDP.PCAP.KD and SP.DYN.LE00.IN
+    
+# clean data the usual way
+    df = clean_data('data/adi_data.csv', indicators_to_plot=['NY.GDP.PCAP.KD','SP.DYN.LE00.IN','SP.POP.TOTL'], keepcolumns = ['country_name_attr', 
+    'indicator_code','1990', '2000','2010'])
+    value_vars = ['1990', '2000', '2010']
+    id_vars = ['country_name_attr','indicator_code']
+    df_melt = df.melt(id_vars = id_vars, value_vars=value_vars)
+    df_melt.columns =  ['country','indicator_code', 'year', 'metric']
+    df_melt['year'] = df_melt['year'].astype('datetime64[ns]').dt.year
 
-    graph_five = []
+# pivot the data for our two indicators to appear as columns and reset the index
+    df_melt = df_melt.pivot(index =[ 'country', 'year'],columns = 'indicator_code', values= 'metric' ).reset_index()
+    df_melt = df_melt.dropna()
+    df_melt.columns = ['country', 'year', 'GDPperCapita_USD', 'LifeExpectancy_years', 'Population']
     
-    graph_five.append(
-      go.Bar(
-        y = [1,2,3,4,5,6,7,8,9,10,11,12],
-        x = ['a','b','c','d','e','f','g','h','i','j', 'k', 'l']
-      )
-    )
-    
-    layout_five = dict(title = 'Chart five',
-                xaxis = dict(title = 'Number'),
-                yaxis = dict(title = 'Letters'),
-                )
-    # append all charts to the figures list
+# create a figure object using plotly.express
+    fig = px.scatter(df_melt, x = 'GDPperCapita_USD', y = 'LifeExpectancy_years',animation_frame = 'year', 
+                    animation_group = 'country', size = 'Population', color = 'country', hover_name = 'country', 
+                    log_x= True, size_max= 100, range_x= [50, 10000], range_y= [25,90], title = 'Life Expectancy vs GDP Per Capita for top 10 countries')
+
+# extract data and layout from embedded px dictionary     
+    graph_five = fig.to_dict()['data']
+    layout_five = fig.to_dict()['layout']
+
+# append all charts to the figures list
     
     figures = []
     figures.append(dict(data=graph_one, layout=layout_one))
