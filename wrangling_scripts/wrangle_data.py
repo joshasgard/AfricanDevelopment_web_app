@@ -192,7 +192,7 @@ def return_figures():
 # create a figure object using plotly.express
     fig = px.scatter(df_melt, x = 'GDPperCapita_USD', y = 'LifeExpectancy_years',animation_frame = 'year', 
                     animation_group = 'country', size = 'Population', color = 'country', hover_name = 'country', 
-                  log_x= True, size_max= 100, range_x= [50, 10000], range_y= [25,90], title = 'Life Expectancy vs GDP Per Capita, 1990 - 2010')
+                  log_x= True, size_max= 100, range_x= [50, 10000], range_y= [25,90])
 
 # extract data and layout from embedded px dictionary     
     graph_five = fig.to_dict()['data']
