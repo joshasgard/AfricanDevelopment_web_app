@@ -18,3 +18,8 @@ def index():
     return render_template('index.html',
                            ids=ids,
                            figuresJSON=figuresJSON)
+
+
+#def agriculture():
+
+ #   figures = return_figures()
