@@ -195,8 +195,8 @@ def return_figures():
                   log_x= True, size_max= 100, range_x= [50, 10000], range_y= [25,90])
 
 # extract data and layout from embedded px dictionary     
-    graph_five = fig.to_dict()['data']
-    layout_five = fig.to_dict()['layout']
+ #   graph_five = fig.to_dict()['data']
+ #   layout_five = fig.to_dict()['layout']
 
 # append all charts to the figures list
     
@@ -205,6 +205,8 @@ def return_figures():
     figures.append(dict(data=graph_two, layout=layout_two))
     figures.append(dict(data=graph_three, layout=layout_three))
     figures.append(dict(data=graph_four, layout=layout_four))
-    figures.append(dict(data=graph_five, layout=layout_five))
+    figures.append(fig)
+    
+#    figures.append(dict(data=graph_five, layout=layout_five))
 
     return figures
